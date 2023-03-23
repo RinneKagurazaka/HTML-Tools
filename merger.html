@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+
+<body>
+    <label for="fileInput1">Select a file :</label>
+    <input type="file" id="fileInput1">
+    <label for="fileInput2">Select your old file:</label>
+    <input type="file" id="fileInput2">
+    <button type="button" onclick="merge()">SUBMIT</button>
+
+    <script>
+        function merge() {
+            const primary = "Username";
+
+            const file1Input = document.getElementById("fileInput1");
+            const file2Input = document.getElementById("fileInput2");
+            const file1 = file1Input.files[0];
+            const file2 = file2Input.files[0];
+
+            const reader = new FileReader();
+
+            reader.onload = function() {
+                const file1Contents = JSON.parse(reader.result);
+
+                reader.onload = function() {
+                    const file2Contents = JSON.parse(reader.result);
+
+                    const mergedArray = file1Contents.map(item1 => {
+                        const item2 = file2Contents.find(item2 => item2[primary] === item1[primary]);
+                        return item2 ? item2 : item1;
+                    }).concat(file2Contents.filter(item2 => !file1Contents.find(item1 => item1[primary] === item2[primary])));
+
+                    const mergedJSON = JSON.stringify(mergedArray, null, 2);
+                    const blob = new Blob([mergedJSON], {
+                        type: "application/json"
+                    });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = "merged.json";
+                    link.click();
+                };
+
+
+                reader.readAsText(file2);
+            };
+
+            reader.readAsText(file1);
+        }
+
+    </script>
+</body>
+
